@@ -12,6 +12,7 @@ const mongoose = require("mongoose");
 
 // import routes
 // !!!!! to do !!!!!!
+const userRoutes = require("./routes/user");
 
 /* ------------------------------------- */
 /*      Mongoose connection section      */
@@ -41,17 +42,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res, next) => {
-  res.end("Voilà la réponse de la première version du serveur !");
-
-  next();
-});
-
 // code to intercept request that have a JSON type content
 app.use(express.json());
 
 // precising adresses of rooters
 // !!!!! to do !!!!!!
+app.use("/api/auth", userRoutes);
 
 /* ------------------------ */
 /*      Export section      */
