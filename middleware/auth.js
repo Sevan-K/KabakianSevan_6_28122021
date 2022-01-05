@@ -13,7 +13,7 @@ module.exports = (request, response, next) => {
     // the userIdFromToken is added to the request
     request.auth = { userId: userIdFromToken };
     // if there is a userId in request's body and if it is not the same than the one from the token
-    if (!request.body.userId && request.body.userId !== userIdFromToken) {
+    if (request.body.userId && request.body.userId !== userIdFromToken) {
       // we throw an error
       throw "Invalid userId";
     }

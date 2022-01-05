@@ -17,8 +17,8 @@ const mongoose = require("mongoose");
 const path = require("path");
 
 // import routes
-// !!!!! to do !!!!!!
 const userRoutes = require("./routes/user");
+const sauceRoutes = require("./routes/sauce");
 
 /* ------------------------------------- */
 /*      Mongoose connection section      */
@@ -55,8 +55,8 @@ app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "immages")));
 
 // precising adresses of rooters
-// !!!!! to do !!!!!!
 app.use("/api/auth", userRoutes);
+app.use("/api/sauces", sauceRoutes);
 
 /* ------------------------ */
 /*      Export section      */
