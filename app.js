@@ -7,8 +7,14 @@ const express = require("express");
 // application constant
 const app = express();
 
+// dotenv module import
+require("dotenv").config();
+
 // mongoose module import
 const mongoose = require("mongoose");
+
+// path package import
+const path = require("path");
 
 // import routes
 // !!!!! to do !!!!!!
@@ -44,6 +50,9 @@ app.use((req, res, next) => {
 
 // code to intercept request that have a JSON type content
 app.use(express.json());
+
+// setting file to serve when /images route is used
+app.use("/images", express.static(path.join(__dirname, "immages")));
 
 // precising adresses of rooters
 // !!!!! to do !!!!!!

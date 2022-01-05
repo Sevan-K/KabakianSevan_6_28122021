@@ -9,7 +9,6 @@ const bcrypt = require("bcrypt");
 
 // jsonwebtoken module import
 const jasonwebtoken = require("jsonwebtoken");
-const { request, response } = require("../app");
 
 /* ---------------------------------- */
 /*      Signup controler section      */
@@ -17,7 +16,7 @@ const { request, response } = require("../app");
 exports.signup = (request, response, next) => {
   bcrypt
     // using bcryp to hash the pasword with a salt value of 10
-    .hash(request.body.password, 10)
+    .hash(request.body.password, process.env)
     // then we get the hash
     .then((hash) => {
       // a new user is created
@@ -67,7 +66,7 @@ exports.login = async (request, response, next) => {
       // the password is correct, the following response is given
       response.status(200).json({
         userId: user._id,
-        token: jasonwebtoken.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+        token: jasonwebtoken.sign({ userId: user._id },process.env.JWT_KEY, {
           expiresIn: "24h",
         }),
       });
