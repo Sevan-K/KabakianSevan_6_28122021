@@ -35,13 +35,13 @@ mongoose
 /*      Middleware section      */
 /* ---------------------------- */
 // middleware to add headers to responses
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
+app.use((req, response, next) => {
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
   );
-  res.setHeader(
+  response.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, PATCH, OPTIONS"
   );
@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // setting file to serve when /images route is used
-app.use("/images", express.static(path.join(__dirname, "immages")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // precising adresses of rooters
 app.use("/api/auth", userRoutes);

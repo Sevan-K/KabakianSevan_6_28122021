@@ -13,12 +13,15 @@ const storage = multer.diskStorage({
   // setting destination
   destination: (request, file, callback) => {
     // destination file is the images one
-    callback(null, images);
+    callback(null, "images");
   },
   // setting filename
   filename: (request, file, callback) => {
     // get original filename and replace " " by "_"
-    const name = file.originalname.split(" ").join("_");
+    // console.log("nom original du fichier", file.originalname);
+    const name = file.originalname.split(" ").join("_").split(".")[0];
+    // const name = file.originalname.split(" ").join("_");
+    // console.log("nom du fichier", name);
     // get extention using MIME_TYPES library
     const extension = MIME_TYPES[file.mimetype];
     // building a unique name
