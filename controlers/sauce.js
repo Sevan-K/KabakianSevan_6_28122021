@@ -15,7 +15,7 @@ exports.getAllSauces = (request, response, next) => {
   // finding all the sauces
   Sauce.find()
     // if it is OK set the answer to 200 and send sauces
-    .then((sauces) => response.status(200).json({ sauces }))
+    .then((sauces) => response.status(200).json(sauces))
     // if not send the error
     .catch((error) => response.status(400).json({ error }));
 };
@@ -26,7 +26,7 @@ exports.getOneSauce = (request, response, next) => {
   Sauce.findOne({ _id: request.params.id })
     // if it is OK set the answer to 200 and send the sauce
     .then((sauce) => {
-      response.status(201).json({ sauce });
+      response.status(200).json(sauce);
     })
     // if not send the error
     .catch((error) => response.status(400).json({ error }));
@@ -61,4 +61,30 @@ exports.createSauce = (request, response, next) => {
       response.status(201).json({ message: "Sauce saved in database !" })
     )
     .catch((error) => response.status(400).json({ error }));
+};
+
+/* -------------------------------- */
+/*      Put controlers section      */
+/* -------------------------------- */
+// exporting route to modify an existing sauce
+exports.modifySauce = (request, response, next) => {
+  console.log("présence d'un fichier :", request.file);
+  // sauce object is either :
+  const sauceObject = request.file
+    ? {
+        // pared from stringified sauce if there is a file, spreaded
+        ...JSON.parse(request.body.sauce),
+        // the url of the new image saved
+        imageUrl: `${request.protocol}://${request.get("host")}/images/${
+          request.file.filename
+        }`,
+      }
+    : {
+        // the body of the request, spreaded
+        ...request.body,
+      };
+  console.log("objet sauce présent dans la requête", sauceObject);
+
+  // code to be sure that the sauce belong to the user trying to modify it
+  // if (sauceObject.userId){}
 };

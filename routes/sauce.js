@@ -8,7 +8,7 @@ const express = require("express");
 const router = express.Router();
 
 // ipmorting user's controlers
-const sauceContrroler = require("../controlers/sauce");
+const sauceControler = require("../controlers/sauce");
 
 // importing auth middleware
 const auth = require("../middleware/auth");
@@ -20,11 +20,13 @@ const multer = require("../middleware/multer-config");
 /*      Routes section      */
 /* ------------------------ */
 // route to get all the sauces
-router.get("/", auth, sauceContrroler.getAllSauces);
+router.get("/", auth, sauceControler.getAllSauces);
 // route to get one sauce based on its id
-router.get("/:id", auth, sauceContrroler.getOneSauce);
+router.get("/:id", auth, sauceControler.getOneSauce);
 // route to create a new sauce
-router.post("/", auth, multer, sauceContrroler.createSauce);
+router.post("/", auth, multer, sauceControler.createSauce);
+// route to modify an existing sauce
+router.put("/:id", auth, multer, sauceControler.modifySauce);
 
 /* ------------------------ */
 /*      Export section      */

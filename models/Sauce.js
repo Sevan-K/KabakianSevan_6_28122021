@@ -6,7 +6,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 // Sauce user schema rules
 const sauceShcema = mongoose.Schema({
-  userID: { type: String, require: true },
+  userId: { type: String, require: true },
   name: { type: String, require: true },
   manufacturer: { type: String, require: true },
   description: { type: String, require: true },
