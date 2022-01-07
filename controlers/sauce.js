@@ -67,8 +67,7 @@ exports.createSauce = (request, response, next) => {
 /*      Put controlers section      */
 /* -------------------------------- */
 // exporting route to modify an existing sauce
-exports.modifySauce = (request, response, next) => {
-  console.log("présence d'un fichier :", request.file);
+exports.modifySauce = async (request, response, next) => {
   // sauce object is either :
   const sauceObject = request.file
     ? {
@@ -83,8 +82,42 @@ exports.modifySauce = (request, response, next) => {
         // the body of the request, spreaded
         ...request.body,
       };
-  console.log("objet sauce présent dans la requête", sauceObject);
 
   // code to be sure that the sauce belong to the user trying to modify it
-  // if (sauceObject.userId){}
+  if (sauceObject.userId !== request.auth.userId) {
+    return response
+      .status(403)
+      .json({ error: new Error("Non authorized request !") });
+  }
+  if (request.file) {
+    // recherche de la sauce avant modification
+    const sauceToUpdate = await Sauce.findOne({ _id: request.params.id });
+    // if the wanted sauce is not found (necessary ??)
+    if (!sauceToUpdate) {
+      return response.status(404).json({
+        error: new Error("No such sauce !"),
+      });
+    }
+    // getting image name from url
+    const filenameToDelete = sauceToUpdate.imageUrl.split("/images/")[1];
+    fs.unlink(`images/${filenameToDelete}`, (error) => {
+      if (error) {
+        console.log("failed to delete local image:" + error);
+      }
+    });
+  }
+  // the sauce which id is in request's parameters is updated
+  Sauce.updateOne(
+    { _id: request.params.id },
+    {
+      // with sauceObject values
+      ...sauceObject,
+      // and the correct id
+      _id: request.params.id,
+    }
+  )
+    // response status is set to OK and a message is sent
+    .then(() => response.status(200).json({ message: "Sauce modified !" }))
+    // response status is set to bad request and the error is sent
+    .catch((error) => response.status(400).json({ error }));
 };
