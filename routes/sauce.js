@@ -27,6 +27,8 @@ router.get("/:id", auth, sauceControler.getOneSauce);
 router.post("/", auth, multer, sauceControler.createSauce);
 // route to modify an existing sauce
 router.put("/:id", auth, multer, sauceControler.modifySauce);
+// route to delete an existing sauce
+router.delete("/:id", auth, sauceControler.deleteSauce);
 
 /* ------------------------ */
 /*      Export section      */

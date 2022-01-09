@@ -6,6 +6,7 @@ const Sauce = require("../models/Sauce");
 
 // fs module import
 const fs = require("fs");
+const { error } = require("console");
 
 /* -------------------------------- */
 /*      Get controlers section      */
@@ -119,5 +120,42 @@ exports.modifySauce = async (request, response, next) => {
     // response status is set to OK and a message is sent
     .then(() => response.status(200).json({ message: "Sauce modified !" }))
     // response status is set to bad request and the error is sent
+    .catch((error) => response.status(400).json({ error }));
+};
+
+/* ----------------------------------- */
+/*      Delete controlers section      */
+/* ----------------------------------- */
+exports.deleteSauce = async (request, response, next) => {
+  // looking for the the sauce which id is in request param
+  const sauceToDelete = await Sauce.findOne({ _id: request.params.id });
+  // if the wanted sauce is not found
+  if (!sauceToDelete) {
+    // returning a code not found and the error message
+    return response
+      .status(404)
+      .json({ error: new Error("No such suace found !") });
+  }
+  // checking if the userId used to create the sauce match the one of the user trying to delete the sauce
+  if (sauceToDelete.userId !== request.auth.userId) {
+    // if it is not the same return a new error
+    return response
+      .status(403)
+      .json({ error: new Error("Non authorized request !") });
+  }
+  // getting the name of the image to delete from iamges folder
+  const filenameToDelete = sauceToDelete.imageUrl.split("/images/")[1];
+  // using fs unlink
+  fs.unlink(`images/${filenameToDelete}`, (error) => {
+    if (error) {
+      console.log("failed to delete local image:");
+    } 
+  });
+  // deleting the sauce which id is in request param
+  Sauce.deleteOne({ _id: request.params.id })
+    // setting a no content status and a message
+    .then(() => {
+      response.status(200).json({ message: "Sauce deleted !" });
+    })
     .catch((error) => response.status(400).json({ error }));
 };
