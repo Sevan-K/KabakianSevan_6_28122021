@@ -148,8 +148,8 @@ exports.deleteSauce = async (request, response, next) => {
   // using fs unlink
   fs.unlink(`images/${filenameToDelete}`, (error) => {
     if (error) {
-      console.log("failed to delete local image:");
-    } 
+      console.log("failed to delete local image:" + error);
+    }
   });
   // deleting the sauce which id is in request param
   Sauce.deleteOne({ _id: request.params.id })
@@ -158,4 +158,36 @@ exports.deleteSauce = async (request, response, next) => {
       response.status(200).json({ message: "Sauce deleted !" });
     })
     .catch((error) => response.status(400).json({ error }));
+};
+
+/* --------------------------------------------- */
+/*      Like and Dislike controlers section      */
+/* --------------------------------------------- */
+// exporting the controller to handle like or dislike
+exports.likesAndDislikesHandler = (request, response, next) => {
+  // looking for the sauce to like or dislike
+  Sauce.findOne({ _id: request.params.id })
+    .then((sauce) => {
+      console.log(sauce);
+      // if like value is 1
+      // adding the userId to the usersLiked array of the sauce
+      sauce.usersLiked.push(request.body.userId);
+      // updating the number of likes
+      sauce.likes = sauce.usersLiked.length;
+      // if like value is 0
+      // if like value is -1
+      // modify the sauce into the database
+      console.log(sauce);
+      Sauce.updateOne(
+        { _id: request.params.id },
+        { ...sauce, _id: request.params.id }
+      )
+        // response status is set to OK and a message is sent
+        .then(() => response.status(200).json({ message: "Sauce modified !" }))
+        // response status is set to bad request and the error is sent
+        .catch((error) => response.status(404).json({ error }));
+    })
+    .catch((error) => {
+      response.status(400).json({ error });
+    });
 };
