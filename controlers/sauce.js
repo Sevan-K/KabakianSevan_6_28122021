@@ -169,6 +169,7 @@ exports.likesAndDislikesHandler = async (request, response, next) => {
   // looking for the sauce to like or dislike
   try {
     const likeValue = request.body.like;
+    console.log("Valeur du like : ", likeValue);
     sauceToRate = await Sauce.findOne({ _id: request.params.id });
     // if the wanted sauce is not found
     if (!sauceToRate) {
@@ -177,33 +178,50 @@ exports.likesAndDislikesHandler = async (request, response, next) => {
         .status(404)
         .json({ error: new Error("No such suace found !") });
     }
-    // console.log("sauce avant modification", sauceToRate);
-    // if like value is 1
-    if (likeValue === 1) {
-      // utiliser la méthode find pour savoir si le userId est déjà présent
-      let isSauceRated = (userId, array) => {
-        const found = array.find((element) => element === userId);
-        if (!found) {
-          return false;
-        }
-        return true;
-      };
-      console.log(isSauceRated(request.body.userId, sauceToRate.usersLiked));
-      // if (isSauceRated(request.body.userId, sauceToRate.usersLiked)) {
-      //   return response
-      //     .status(403)
-      //     .json({ error: new Error("Sauce already rated !") });
-      // }
-      // adding the userId to the usersLiked array of the sauce
-      sauceToRate.usersLiked.push(request.body.userId);
-      // updating the number of likes
-      sauceToRate.likes = sauceToRate.usersLiked.length;
-    }
 
-    // if like value is 0
-    // if like value is -1
-    // modify the sauce into the database
+    // function returning trus if the sauce is already liked or disliked by a user
+    let isSauceRated = (userId, array) => {
+      const found = array.find((element) => element === userId);
+      if (!found) {
+        return false;
+      }
+      return true;
+    };
+
+    // console.log("sauce avant modification", sauceToRate);
+
+    switch (likeValue) {
+      // if like value is 1
+      case 1:
+        console.log(isSauceRated(request.body.userId, sauceToRate.usersLiked));
+        if (!isSauceRated(request.body.userId, sauceToRate.usersLiked)) {
+          // adding the userId to the usersLiked array of the sauce
+          sauceToRate.usersLiked.push(request.body.userId);
+          // updating the number of likes
+          sauceToRate.likes = sauceToRate.usersLiked.length;
+        }
+
+        break;
+      // if like value is 0
+      case 0:
+        console.log("Enlever le like ou le dislike");
+        break;
+      // if like value is -1
+      case -1:
+        console.log(
+          isSauceRated(request.body.userId, sauceToRate.usersDisliked)
+        );
+        if (!isSauceRated(request.body.userId, sauceToRate.usersDisliked)) {
+          // adding the userId to the usersLiked array of the sauce
+          sauceToRate.usersDisliked.push(request.body.userId);
+          // updating the number of likes
+          sauceToRate.dislikes = sauceToRate.usersDisliked.length;
+        }
+        break;
+    }
     // console.log("sauce après modification", sauceToRate);
+
+    // modify the sauce into the database
     sauceToRate
       .save()
       .then(() =>
