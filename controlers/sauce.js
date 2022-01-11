@@ -164,11 +164,26 @@ exports.deleteSauce = async (request, response, next) => {
 /* --------------------------------------------- */
 /*      Like and Dislike controlers section      */
 /* --------------------------------------------- */
+// function returning trus if the sauce is already liked or disliked by a user
+let isSauceRated = (userId, array) => {
+  const found = array.find((element) => element === userId);
+  if (!found) {
+    return false;
+  }
+  return true;
+};
+
+// functino to remove a userId from an array
+function removeUserIdFromArray(userId, array) {
+  return array.filter((element) => element !== userId);
+}
+
 // exporting the controller to handle like or dislike
 exports.likesAndDislikesHandler = async (request, response, next) => {
   // looking for the sauce to like or dislike
   try {
     const likeValue = request.body.like;
+    const userIdFromRequest = request.body.userId;
     console.log("Valeur du like : ", likeValue);
     sauceToRate = await Sauce.findOne({ _id: request.params.id });
     // if the wanted sauce is not found
@@ -179,44 +194,41 @@ exports.likesAndDislikesHandler = async (request, response, next) => {
         .json({ error: new Error("No such suace found !") });
     }
 
-    // function returning trus if the sauce is already liked or disliked by a user
-    let isSauceRated = (userId, array) => {
-      const found = array.find((element) => element === userId);
-      if (!found) {
-        return false;
-      }
-      return true;
-    };
-
     // console.log("sauce avant modification", sauceToRate);
 
     switch (likeValue) {
       // if like value is 1
       case 1:
-        console.log(isSauceRated(request.body.userId, sauceToRate.usersLiked));
-        if (!isSauceRated(request.body.userId, sauceToRate.usersLiked)) {
-          // adding the userId to the usersLiked array of the sauce
-          sauceToRate.usersLiked.push(request.body.userId);
-          // updating the number of likes
-          sauceToRate.likes = sauceToRate.usersLiked.length;
-        }
-
+        // adding the userId to the usersLiked array of the sauce
+        sauceToRate.usersLiked.push(userIdFromRequest);
+        // updating the number of likes
+        sauceToRate.likes = sauceToRate.usersLiked.length;
         break;
       // if like value is 0
       case 0:
-        console.log("Enlever le like ou le dislike");
+        // if the userId is in usersLiked array
+        if (isSauceRated(userIdFromRequest, sauceToRate.usersLiked)) {
+          sauceToRate.usersLiked = removeUserIdFromArray(
+            userIdFromRequest,
+            sauceToRate.usersLiked
+          );
+          sauceToRate.likes = sauceToRate.usersLiked.length;
+        } else if (isSauceRated(userIdFromRequest, sauceToRate.usersDisliked)) {
+          sauceToRate.usersDisliked = removeUserIdFromArray(
+            userIdFromRequest,
+            sauceToRate.usersDisliked
+          );
+          sauceToRate.dislikes = sauceToRate.usersDisliked.length;
+        } else {
+          throw "Can not unlike or undislike in this case";
+        }
         break;
       // if like value is -1
       case -1:
-        console.log(
-          isSauceRated(request.body.userId, sauceToRate.usersDisliked)
-        );
-        if (!isSauceRated(request.body.userId, sauceToRate.usersDisliked)) {
-          // adding the userId to the usersLiked array of the sauce
-          sauceToRate.usersDisliked.push(request.body.userId);
-          // updating the number of likes
-          sauceToRate.dislikes = sauceToRate.usersDisliked.length;
-        }
+        // adding the userId to the usersLiked array of the sauce
+        sauceToRate.usersDisliked.push(userIdFromRequest);
+        // updating the number of likes
+        sauceToRate.dislikes = sauceToRate.usersDisliked.length;
         break;
     }
     // console.log("sauce après modification", sauceToRate);
@@ -228,9 +240,7 @@ exports.likesAndDislikesHandler = async (request, response, next) => {
         response.status(201).json({ message: "Sauce saved in database !" })
       )
       .catch((error) => response.status(400).json({ error }));
-
-    // response.status(200).json({ message: "Sauce rated, but not saved !" });
   } catch (error) {
-    console.log("Erreur : ", error);
+    response.status(400).json({ error });
   }
 };
