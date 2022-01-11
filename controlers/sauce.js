@@ -7,6 +7,7 @@ const Sauce = require("../models/Sauce");
 // fs module import
 const fs = require("fs");
 const { error } = require("console");
+const { stringify } = require("querystring");
 
 /* -------------------------------- */
 /*      Get controlers section      */
@@ -164,30 +165,54 @@ exports.deleteSauce = async (request, response, next) => {
 /*      Like and Dislike controlers section      */
 /* --------------------------------------------- */
 // exporting the controller to handle like or dislike
-exports.likesAndDislikesHandler = (request, response, next) => {
+exports.likesAndDislikesHandler = async (request, response, next) => {
   // looking for the sauce to like or dislike
-  Sauce.findOne({ _id: request.params.id })
-    .then((sauce) => {
-      console.log(sauce);
-      // if like value is 1
+  try {
+    const likeValue = request.body.like;
+    sauceToRate = await Sauce.findOne({ _id: request.params.id });
+    // if the wanted sauce is not found
+    if (!sauceToRate) {
+      // returning a code not found and the error message
+      return response
+        .status(404)
+        .json({ error: new Error("No such suace found !") });
+    }
+    // console.log("sauce avant modification", sauceToRate);
+    // if like value is 1
+    if (likeValue === 1) {
+      // utiliser la méthode find pour savoir si le userId est déjà présent
+      let isSauceRated = (userId, array) => {
+        const found = array.find((element) => element === userId);
+        if (!found) {
+          return false;
+        }
+        return true;
+      };
+      console.log(isSauceRated(request.body.userId, sauceToRate.usersLiked));
+      // if (isSauceRated(request.body.userId, sauceToRate.usersLiked)) {
+      //   return response
+      //     .status(403)
+      //     .json({ error: new Error("Sauce already rated !") });
+      // }
       // adding the userId to the usersLiked array of the sauce
-      sauce.usersLiked.push(request.body.userId);
+      sauceToRate.usersLiked.push(request.body.userId);
       // updating the number of likes
-      sauce.likes = sauce.usersLiked.length;
-      // if like value is 0
-      // if like value is -1
-      // modify the sauce into the database
-      console.log(sauce);
-      Sauce.updateOne(
-        { _id: request.params.id },
-        { ...sauce, _id: request.params.id }
+      sauceToRate.likes = sauceToRate.usersLiked.length;
+    }
+
+    // if like value is 0
+    // if like value is -1
+    // modify the sauce into the database
+    // console.log("sauce après modification", sauceToRate);
+    sauceToRate
+      .save()
+      .then(() =>
+        response.status(201).json({ message: "Sauce saved in database !" })
       )
-        // response status is set to OK and a message is sent
-        .then(() => response.status(200).json({ message: "Sauce modified !" }))
-        // response status is set to bad request and the error is sent
-        .catch((error) => response.status(404).json({ error }));
-    })
-    .catch((error) => {
-      response.status(400).json({ error });
-    });
+      .catch((error) => response.status(400).json({ error }));
+
+    // response.status(200).json({ message: "Sauce rated, but not saved !" });
+  } catch (error) {
+    console.log("Erreur : ", error);
+  }
 };
