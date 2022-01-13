@@ -10,6 +10,9 @@ const app = express();
 // dotenv module import
 require("dotenv").config();
 
+// helmet module import
+const helmet = require("helmet");
+
 // mongoose module import
 const mongoose = require("mongoose");
 
@@ -34,6 +37,9 @@ mongoose
 /* ---------------------------- */
 /*      Middleware section      */
 /* ---------------------------- */
+// helmet middleware
+app.use(helmet());
+
 // middleware to add headers to responses
 app.use((req, response, next) => {
   response.setHeader("Access-Control-Allow-Origin", "*");

@@ -6,8 +6,6 @@ const Sauce = require("../models/Sauce");
 
 // fs module import
 const fs = require("fs");
-const { error } = require("console");
-const { stringify } = require("querystring");
 
 /* -------------------------------- */
 /*      Get controlers section      */
@@ -182,9 +180,10 @@ function removeUserIdFromArray(userId, array) {
 exports.likesAndDislikesHandler = async (request, response, next) => {
   // looking for the sauce to like or dislike
   try {
+    // storing like value into a constant
     const likeValue = request.body.like;
+    // storing the userId of the request body into a constant
     const userIdFromRequest = request.body.userId;
-    console.log("Valeur du like : ", likeValue);
     sauceToRate = await Sauce.findOne({ _id: request.params.id });
     // if the wanted sauce is not found
     if (!sauceToRate) {
@@ -193,9 +192,8 @@ exports.likesAndDislikesHandler = async (request, response, next) => {
         .status(404)
         .json({ error: new Error("No such suace found !") });
     }
-
     // console.log("sauce avant modification", sauceToRate);
-
+    // handling the different values of like
     switch (likeValue) {
       // if like value is 1
       case 1:
@@ -220,7 +218,7 @@ exports.likesAndDislikesHandler = async (request, response, next) => {
           );
           sauceToRate.dislikes = sauceToRate.usersDisliked.length;
         } else {
-          throw "Can not unlike or undislike in this case";
+          throw new Error("Can not unlike or undislike in this case !");
         }
         break;
       // if like value is -1

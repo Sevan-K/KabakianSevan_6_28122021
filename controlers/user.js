@@ -66,7 +66,7 @@ exports.login = async (request, response, next) => {
       // the password is correct, the following response is given
       response.status(200).json({
         userId: user._id,
-        token: jasonwebtoken.sign({ userId: user._id },process.env.JWT_KEY, {
+        token: jasonwebtoken.sign({ userId: user._id }, process.env.JWT_KEY, {
           expiresIn: "24h",
         }),
       });
