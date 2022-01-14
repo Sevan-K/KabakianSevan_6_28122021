@@ -38,7 +38,12 @@ mongoose
 /*      Middleware section      */
 /* ---------------------------- */
 // helmet middleware
-app.use(helmet());
+app.use(
+  helmet.crossOriginResourcePolicy(
+    //setting crossOriginResourcePolicy to cross-origin to avoid conflict with the header we set later
+    { policy: "cross-origin" }
+  )
+);
 
 // middleware to add headers to responses
 app.use((req, response, next) => {

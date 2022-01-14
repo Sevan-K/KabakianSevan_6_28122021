@@ -14,9 +14,11 @@ const jasonwebtoken = require("jsonwebtoken");
 /*      Signup controler section      */
 /* ---------------------------------- */
 exports.signup = (request, response, next) => {
+  const salt = parseInt(process.env.SALT);
   bcrypt
     // using bcryp to hash the pasword with a salt value of 10
-    .hash(request.body.password, process.env)
+
+    .hash(request.body.password, salt)
     // then we get the hash
     .then((hash) => {
       // a new user is created
@@ -37,13 +39,21 @@ exports.signup = (request, response, next) => {
         .catch((error) => response.status(400).json({ error }));
     })
     // catching error while creating user
-    .catch((error) => response.status(500).json({ error }));
+    .catch((error) => {
+      console.log("voilà l'erreur : ", error);
+      response.status(500).json({ error });
+    });
 };
 
 /* --------------------------------- */
 /*      Login controler section      */
 /* --------------------------------- */
 exports.login = async (request, response, next) => {
+  // const sentPassword = await bcrypt.hash(
+  //   request.body.password,
+  //   process.env.SALT
+  // );
+  // console.log(sentPassword);
   try {
     // looking for the user with the same email than the one in the request's body
     const user = await User.findOne({ email: request.body.email });
