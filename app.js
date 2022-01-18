@@ -46,7 +46,7 @@ app.use(
 );
 
 // middleware to add headers to responses
-app.use((req, response, next) => {
+app.use((request, response, next) => {
   response.setHeader("Access-Control-Allow-Origin", "*");
   response.setHeader(
     "Access-Control-Allow-Headers",

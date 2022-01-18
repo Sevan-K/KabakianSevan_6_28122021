@@ -1,9 +1,6 @@
 // mongoose module import
 const mongoose = require("mongoose");
 
-// unique validator module import
-const uniqueValidator = require("mongoose-unique-validator");
-
 // Sauce user schema rules
 const sauceShcema = mongoose.Schema({
   userId: { type: String, require: true },

@@ -68,10 +68,16 @@ exports.createSauce = (request, response, next) => {
 /* -------------------------------- */
 // exporting route to modify an existing sauce
 exports.modifySauce = async (request, response, next) => {
+  // code to be sure that the sauce belong to the user trying to modify it
+  if (sauceObject.userId !== request.auth.userId) {
+    return response
+      .status(403)
+      .json({ error: new Error("Non authorized request !") });
+  }
   // sauce object is either :
   const sauceObject = request.file
     ? {
-        // pared from stringified sauce if there is a file, spreaded
+        // parsed from stringified sauce if there is a file, spreaded
         ...JSON.parse(request.body.sauce),
         // the url of the new image saved
         imageUrl: `${request.protocol}://${request.get("host")}/images/${
@@ -82,13 +88,7 @@ exports.modifySauce = async (request, response, next) => {
         // the body of the request, spreaded
         ...request.body,
       };
-
-  // code to be sure that the sauce belong to the user trying to modify it
-  if (sauceObject.userId !== request.auth.userId) {
-    return response
-      .status(403)
-      .json({ error: new Error("Non authorized request !") });
-  }
+  // action to do only if there is a file
   if (request.file) {
     // recherche de la sauce avant modification
     const sauceToUpdate = await Sauce.findOne({ _id: request.params.id });
