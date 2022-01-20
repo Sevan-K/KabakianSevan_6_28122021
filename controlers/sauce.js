@@ -7,6 +7,9 @@ const Sauce = require("../models/Sauce");
 // fs module import
 const fs = require("fs");
 
+// importing Joi schema for validation
+joiSchema = require("../middleware/schemas");
+
 /* -------------------------------- */
 /*      Get controlers section      */
 /* -------------------------------- */
@@ -112,20 +115,23 @@ exports.modifySauce = async (request, response, next) => {
   sauceToUpdate = {
     // with sauceObject values
     ...sauceObject,
-    // and the correct id
+    // and the correct id to be sure
     _id: request.params.id,
   };
-
-  // the sauce which id is in request's parameters is updated
-  Sauce.updateOne(
-    { _id: request.params.id },
-    {
-      // with sauceObject values
-      ...sauceObject,
-      // and the correct id
-      _id: request.params.id,
-    }
-  )
+  // on affiche la sauce
+  // console.log(sauceToUpdate);
+  // checking if the body of the sauce to update matches the joi shema sauces
+  const result = joiSchema.sauces.validate(sauceToUpdate);
+  // console.log("résultat", result);
+  // if there is an error
+  if (result.error) {
+    // then return an error status and a message
+    return response.status(400).json({
+      message:
+        "Please enter valid inputs, special characters are not allowed !",
+    });
+  } // the sauce which id is in request's parameters is updated
+  Sauce.updateOne({ _id: request.params.id }, sauceToUpdate)
 
     // response status is set to OK and a message is sent
     .then(() => response.status(200).json({ message: "Sauce modified !" }))

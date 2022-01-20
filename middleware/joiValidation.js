@@ -1,6 +1,3 @@
-// Joi module import
-const Joi = require("joi");
-
 // importing schemas
 const schemas = require("./schemas");
 
