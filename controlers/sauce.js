@@ -90,9 +90,9 @@ exports.modifySauce = async (request, response, next) => {
       };
   // action to do only if there is a file
   if (request.file) {
-    // recherche de la sauce avant modification
+    // looking for the sauce to update
     const sauceToUpdate = await Sauce.findOne({ _id: request.params.id });
-    // if the wanted sauce is not found (necessary ??)
+    // if the wanted sauce is not found
     if (!sauceToUpdate) {
       return response.status(404).json({
         error: new Error("No such sauce !"),
