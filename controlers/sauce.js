@@ -68,12 +68,6 @@ exports.createSauce = (request, response, next) => {
 /* -------------------------------- */
 // exporting route to modify an existing sauce
 exports.modifySauce = async (request, response, next) => {
-  // code to be sure that the sauce belong to the user trying to modify it
-  if (sauceObject.userId !== request.auth.userId) {
-    return response
-      .status(403)
-      .json({ error: new Error("Non authorized request !") });
-  }
   // sauce object is either :
   const sauceObject = request.file
     ? {
@@ -88,6 +82,12 @@ exports.modifySauce = async (request, response, next) => {
         // the body of the request, spreaded
         ...request.body,
       };
+  // code to be sure that the sauce belong to the user trying to modify it
+  if (sauceObject.userId !== request.auth.userId) {
+    return response
+      .status(403)
+      .json({ error: new Error("Non authorized request !") });
+  }
   // action to do only if there is a file
   if (request.file) {
     // looking for the sauce to update
