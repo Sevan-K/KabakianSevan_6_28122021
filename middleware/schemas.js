@@ -22,7 +22,7 @@ const schemas = {
   sauces: Joi.object().keys({
     _id: Joi.string().required(),
     userId: Joi.string().required(),
-    name: Joi.string().regex(regexForNames),
+    name: Joi.string().regex(regexForNames).required(),
     manufacturer: Joi.string().regex(regexForNames),
     description: Joi.string().regex(regexForDescription),
     mainPepper: Joi.string().regex(regexForNames),
