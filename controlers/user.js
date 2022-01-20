@@ -59,8 +59,9 @@ exports.login = async (request, response, next) => {
     const user = await User.findOne({ email: request.body.email });
     // if user is not defined
     if (!user) {
+      let error = new Error("User not found !");
       // return an error saying that user has not been found
-      return response.status(400).json({ message: "User not found !" });
+      return response.status(400).json({ message: error.message });
     }
     try {
       // if the user is found the pasword is compared using bcrypt
@@ -70,8 +71,9 @@ exports.login = async (request, response, next) => {
       );
       // if the password does not match
       if (!isPasswordValid) {
+        let error = new Error("Invalid pasword !");
         // return an error and a message saying that the pasword is invalid
-        return response.status(401).json({ message: "Invalid pasword" });
+        return response.status(401).json({ message: error.message });
       }
       // the password is correct, the following response is given
       response.status(200).json({
@@ -82,10 +84,11 @@ exports.login = async (request, response, next) => {
       });
     } catch (error) {
       // catching an error while comparing the password
-      (error) => response.status(500).json({ error });
+      (error) =>
+        response.status(error.status || 500).json({ message: error.message });
     }
   } catch (error) {
     // catching an error while looking for the user
-    (error) => response.status(500).json({ error });
+    response.status(error.status || 500).json({ message: error.message });
   }
 };

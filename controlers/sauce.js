@@ -60,7 +60,9 @@ exports.createSauce = (request, response, next) => {
     .then(() =>
       response.status(201).json({ message: "Sauce saved in database !" })
     )
-    .catch((error) => response.status(400).json({ error }));
+    .catch((error) =>
+      response.status(error.status || 400).json({ message: error.message })
+    );
 };
 
 /* -------------------------------- */
@@ -106,6 +108,14 @@ exports.modifySauce = async (request, response, next) => {
       }
     });
   }
+  // the sauce to update is updated with information of the request
+  sauceToUpdate = {
+    // with sauceObject values
+    ...sauceObject,
+    // and the correct id
+    _id: request.params.id,
+  };
+
   // the sauce which id is in request's parameters is updated
   Sauce.updateOne(
     { _id: request.params.id },
@@ -116,10 +126,13 @@ exports.modifySauce = async (request, response, next) => {
       _id: request.params.id,
     }
   )
+
     // response status is set to OK and a message is sent
     .then(() => response.status(200).json({ message: "Sauce modified !" }))
-    // response status is set to bad request and the error is sent
-    .catch((error) => response.status(400).json({ error }));
+    // response status is set to bad request and the error message is sent
+    .catch((error) =>
+      response.status(error.status || 400).json({ message: error.message })
+    );
 };
 
 /* ----------------------------------- */
@@ -232,12 +245,8 @@ exports.likesAndDislikesHandler = async (request, response, next) => {
     // console.log("sauce après modification", sauceToRate);
 
     // modify the sauce into the database
-    sauceToRate
-      .save()
-      .then(() =>
-        response.status(201).json({ message: "Sauce saved in database !" })
-      )
-      .catch((error) => response.status(400).json({ error }));
+    await sauceToRate.save();
+    response.status(201).json({ message: "Sauce saved in database !" });
   } catch (error) {
     response.status(400).json({ error });
   }
