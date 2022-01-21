@@ -6,7 +6,7 @@ const Joi = require("joi");
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 // regex for name and
 const regexForNames =
-  /^\b((?!-)(?!.*--)(?!')(?!.*'')[-A-ZÀ-ÿa-z0-9. ']{2,20}(?<!-)(?<!'))$/;
+  /^\b((?!-)(?!.*--)(?!')(?!.*'')[-A-ZÀ-ÿa-z0-9. ']{2,30}(?<!-)(?<!'))$/;
 // regex for name and
 const regexForDescription =
   /^\b((?!-)(?!.*--)(?!')(?!.*'')[-A-ZÀ-ÿa-z0-9!,?. ']{2,100}(?<!-)(?<!'))$/;

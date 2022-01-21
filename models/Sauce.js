@@ -3,11 +3,10 @@ const mongoose = require("mongoose");
 
 // regex for name and
 const regexForNames =
-  /^\b((?!-)(?!.*--)(?!')(?!.*'')[-A-ZÀ-ÿa-z0-9. ']{2,20}(?<!-)(?<!'))$/;
-
+  /^\b((?!-)(?!.*--)(?!')(?!.*'')[-A-ZÀ-ÿa-z0-9. ']{2,30}(?<!-)(?<!'))$/;
 // regex for name and
 const regexForDescription =
-  /^\b((?!-)(?!.*--)(?!')(?!.*'')[-A-ZÀ-ÿa-z0-9. ']{2,100}(?<!-)(?<!'))$/;
+  /^\b((?!-)(?!.*--)(?!')(?!.*'')[-A-ZÀ-ÿa-z0-9!,?. ']{2,100}(?<!-)(?<!'))$/;
 
 // Sauce user schema rules
 const sauceShcema = mongoose.Schema({
@@ -19,7 +18,7 @@ const sauceShcema = mongoose.Schema({
     validate: {
       validator: (value) => regexForNames.test(value),
       message: (props) =>
-        `${props.value} is not a valid name (Only words, . and - are allowed)`,
+        `${props.value} is not a valid name (Only words, . and - are allowed) or too long (max 30 characters)`,
     },
   },
   manufacturer: {
@@ -29,7 +28,7 @@ const sauceShcema = mongoose.Schema({
       // validation entry for manufacturer
       validator: (value) => regexForNames.test(value),
       message: (props) =>
-        `${props.value} is not a valid name (Only words, . and - are allowed)`,
+        `${props.value} is not a valid name (Only words, . and - are allowed) or too long (max 30 characters)`,
     },
   },
   description: {
@@ -39,7 +38,7 @@ const sauceShcema = mongoose.Schema({
     validate: {
       validator: (value) => regexForDescription.test(value),
       message: (props) =>
-        `${props.value} is not a valid name (Only words, . and - are allowed)`,
+        `${props.value} is not a valid name (Only words, . and - are allowed) or too long (max 100 characters)`,
     },
   },
   mainPepper: {

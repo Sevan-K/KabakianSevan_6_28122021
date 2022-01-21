@@ -89,9 +89,8 @@ exports.modifySauce = async (request, response, next) => {
       };
   // code to be sure that the sauce belong to the user trying to modify it
   if (sauceObject.userId !== request.auth.userId) {
-    return response
-      .status(403)
-      .json({ error: new Error("Non authorized request !") });
+    let error = new Error("Non authorized request !");
+    return response.status(403).json({ message: error.message });
   }
   // action to do only if there is a file
   if (request.file) {
@@ -122,13 +121,12 @@ exports.modifySauce = async (request, response, next) => {
   // console.log(sauceToUpdate);
   // checking if the body of the sauce to update matches the joi shema sauces
   const result = joiSchema.sauces.validate(sauceToUpdate);
-  // console.log("résultat", result);
   // if there is an error
   if (result.error) {
+    // console.log("résultat", result.error.message.split(":")[0]);
     // then return an error status and a message
     return response.status(400).json({
-      message:
-        "Please enter valid inputs, special characters are not allowed !",
+      message: result.error.message.split(":")[0],
     });
   } // the sauce which id is in request's parameters is updated
   Sauce.updateOne({ _id: request.params.id }, sauceToUpdate)
