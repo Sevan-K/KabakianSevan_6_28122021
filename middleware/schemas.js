@@ -20,13 +20,13 @@ const schemas = {
   }),
   // sauces schema
   sauces: Joi.object().keys({
-    _id: Joi.string().required(),
     userId: Joi.string().required(),
     name: Joi.string().regex(regexForNames).required(),
-    manufacturer: Joi.string().regex(regexForNames),
-    description: Joi.string().regex(regexForDescription),
-    mainPepper: Joi.string().regex(regexForNames),
+    manufacturer: Joi.string().regex(regexForNames).required(),
+    description: Joi.string().regex(regexForDescription).required(),
+    mainPepper: Joi.string().regex(regexForNames).required(),
     heat: Joi.number().min(1).max(10).required(),
+    imageUrl: Joi.string(),
   }),
 };
 

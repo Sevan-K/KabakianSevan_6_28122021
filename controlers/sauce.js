@@ -87,11 +87,26 @@ exports.modifySauce = async (request, response, next) => {
         // the body of the request, spreaded
         ...request.body,
       };
+  // on affiche la sauce
+  // console.log(sauceObject);
+
   // code to be sure that the sauce belong to the user trying to modify it
   if (sauceObject.userId !== request.auth.userId) {
     let error = new Error("Non authorized request !");
     return response.status(403).json({ message: error.message });
   }
+
+  // checking if the body of the sauceObject matches the joi shema sauces
+  const result = joiSchema.sauces.validate(sauceObject);
+  // if there is an error
+  if (result.error) {
+    // console.log("résultat", result.error.message.split(":")[0]);
+    // then return an error status and a message
+    return response.status(400).json({
+      message: result.error.message.split(":")[0],
+    });
+  }
+
   // action to do only if there is a file
   if (request.file) {
     // looking for the sauce to update
@@ -110,6 +125,7 @@ exports.modifySauce = async (request, response, next) => {
       }
     });
   }
+
   // the sauce to update is updated with information of the request
   sauceToUpdate = {
     // with sauceObject values
@@ -117,18 +133,8 @@ exports.modifySauce = async (request, response, next) => {
     // and the correct id to be sure
     _id: request.params.id,
   };
-  // on affiche la sauce
-  // console.log(sauceToUpdate);
-  // checking if the body of the sauce to update matches the joi shema sauces
-  const result = joiSchema.sauces.validate(sauceToUpdate);
-  // if there is an error
-  if (result.error) {
-    // console.log("résultat", result.error.message.split(":")[0]);
-    // then return an error status and a message
-    return response.status(400).json({
-      message: result.error.message.split(":")[0],
-    });
-  } // the sauce which id is in request's parameters is updated
+
+  // the sauce which id is in request's parameters is updated
   Sauce.updateOne({ _id: request.params.id }, sauceToUpdate)
 
     // response status is set to OK and a message is sent
